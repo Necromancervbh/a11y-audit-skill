@@ -32,7 +32,8 @@
     "src",
     "skills",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "action.yml"
   ],
   "engines": {
     "node": ">=18"
