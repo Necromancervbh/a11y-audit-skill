@@ -49,12 +49,20 @@ npx a11y-audit ./dist/index.html --fail-on critical         # local files work t
 npx a11y-audit http://localhost:3000 --screenshot           # plus page-1.png with every issue outlined
 ```
 
-Exit code 1 means issues at or above `--fail-on` (default `serious`), so it drops straight into CI:
+Exit code 1 means issues at or above `--fail-on` (default `serious`).
+
+## Use it in CI (GitHub Action)
 
 ```yaml
-- run: npx playwright install --with-deps chromium
-- run: npx a11y-audit http://localhost:3000 --fail-on serious
+- uses: Necromancervbh/a11y-audit-skill@v1
+  with:
+    url: http://localhost:3000        # or a built file: dist/index.html
+    click: |                          # optional: states to audit, one selector per line
+      #open-signin
+    fail-on: serious                  # default
 ```
+
+The job fails on issues at or above `fail-on`, the full report appears in the run's summary, and the report plus an annotated screenshot are uploaded as the `a11y-report` artifact. Outputs: `total`, `critical`, `serious`, `report`. Start your dev server in an earlier step, or point `url` at built HTML.
 
 ## Try it on the demo
 

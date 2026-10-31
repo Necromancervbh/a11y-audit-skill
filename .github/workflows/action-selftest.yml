@@ -1,0 +1,37 @@
+name: action self-test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  broken-page-fails:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: audit
+        uses: ./
+        continue-on-error: true
+        with:
+          url: demo/broken-shop/index.html
+          out: broken-report
+          artifact-name: broken-report
+      - name: The broken shop must fail, with its known issue counts
+        run: |
+          test "${{ steps.audit.outcome }}" = failure
+          test "${{ steps.audit.outputs.total }}" = 31
+          test "${{ steps.audit.outputs.critical }}" = 4
+          test -f broken-report/page-1.png
+
+  fixed-page-passes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: audit
+        uses: ./
+        with:
+          url: demo/fixed-shop/index.html
+          click: .top .btn
+          artifact-name: fixed-report
+      - run: test "${{ steps.audit.outputs.total }}" = 0

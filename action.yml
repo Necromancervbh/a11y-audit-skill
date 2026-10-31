@@ -1,0 +1,96 @@
+name: a11y audit
+description: Audit a page for accessibility (WCAG 2.2 A/AA) in a real browser, with a keyboard-only walk. Fails the job on serious issues.
+author: Necromancervbh
+branding:
+  icon: eye
+  color: blue
+
+inputs:
+  url:
+    description: Page to audit, a URL or a path to an HTML file in the repository.
+    required: true
+  click:
+    description: Selectors to click before auditing, one per line, to audit a state like an open dialog.
+    default: ""
+  fail-on:
+    description: "Fail when there's an issue this severe or worse: critical, serious, moderate, minor, or none."
+    default: serious
+  screenshot:
+    description: Also save page-1.png with each critical and serious issue outlined.
+    default: "true"
+  out:
+    description: Directory for report.md, report.json and screenshots.
+    default: a11y-report
+  artifact-name:
+    description: Name of the uploaded report artifact. Change it when the action runs more than once in a workflow.
+    default: a11y-report
+
+outputs:
+  total:
+    description: Number of issues found.
+    value: ${{ steps.audit.outputs.total }}
+  critical:
+    description: Number of critical issues.
+    value: ${{ steps.audit.outputs.critical }}
+  serious:
+    description: Number of serious issues.
+    value: ${{ steps.audit.outputs.serious }}
+  report:
+    description: Path to report.md.
+    value: ${{ steps.audit.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install the audit and Chromium
+      shell: bash
+      run: |
+        npm ci --omit=dev --prefix "$GITHUB_ACTION_PATH" --no-audit --no-fund
+        cd "$GITHUB_ACTION_PATH" && npx playwright install --with-deps chromium
+
+    - name: Audit
+      id: audit
+      shell: bash
+      env:
+        URL: ${{ inputs.url }}
+        CLICK: ${{ inputs.click }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        SCREENSHOT: ${{ inputs.screenshot }}
+        OUT: ${{ inputs.out }}
+      run: |
+        args=("$URL" --out "$OUT" --fail-on "$FAIL_ON")
+        while IFS= read -r sel; do [ -n "$sel" ] && args+=(--click "$sel"); done <<< "$CLICK"
+        [ "$SCREENSHOT" = "true" ] && args+=(--screenshot)
+        set +e
+        node "$GITHUB_ACTION_PATH/src/cli.mjs" "${args[@]}"
+        code=$?
+        set -e
+        [ "$code" -gt 1 ] && exit "$code"   # 2 = the audit itself failed
+        node -e '
+          const r = require(require("path").resolve(process.argv[1], "report.json"))[0].summary;
+          const out = require("fs").createWriteStream(process.env.GITHUB_OUTPUT, { flags: "a" });
+          for (const k of ["total", "critical", "serious"]) out.write(`${k}=${r[k]}\n`);
+          out.end();
+        ' "$OUT"
+        echo "report=$OUT/report.md" >> "$GITHUB_OUTPUT"
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        cat "$OUT/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload the report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.out }}
+        if-no-files-found: ignore
+
+    - name: Fail on issues
+      if: steps.audit.outputs.code == '1'
+      shell: bash
+      run: |
+        echo "::error::Accessibility issues at or above '${{ inputs.fail-on }}': see the job summary or the a11y-report artifact."
+        exit 1
