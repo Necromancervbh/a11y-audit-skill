@@ -43,7 +43,7 @@ export function toUrl(target) {
  * options.clicks: selectors to click first, to audit a state such as an open
  * dialog or menu. options.maxTabs: how many Tab presses the keyboard walk makes.
  */
-export async function audit(target, { clicks = [], maxTabs = 80, viewport = { width: 1280, height: 800 } } = {}) {
+export async function audit(target, { clicks = [], maxTabs = 80, viewport = { width: 1280, height: 800 }, screenshot = null } = {}) {
   const url = toUrl(target);
   const browser = await chromium.launch();
   try {
@@ -58,8 +58,9 @@ export async function audit(target, { clicks = [], maxTabs = 80, viewport = { wi
     findings.push(...keyboard.findings);
     const tree = await page.locator("body").ariaSnapshot();
     findings.sort((a, b) => IMPACTS.indexOf(a.impact) - IMPACTS.indexOf(b.impact));
+    if (screenshot) await annotate(page, findings, screenshot);
     return {
-      url, clicks, auditedAt: new Date().toISOString(),
+      url, clicks, auditedAt: new Date().toISOString(), screenshot,
       summary: summarize(findings),
       findings, keyboard: { stops: keyboard.stops, trapped: keyboard.trapped }, tree,
     };
@@ -206,6 +207,55 @@ async function installSelectorHelper(page) {
       return parts.join(" > ");
     };
   });
+}
+
+/**
+ * Save a full-page screenshot with each critical and serious finding outlined
+ * in its severity's color and labelled with its rule. Moderate and minor ones
+ * stay in the report only: on a real page they'd bury the screenshot.
+ * Page-wide findings (on <html>) are skipped.
+ */
+async function annotate(page, findings, path) {
+  const marks = findings
+    .filter((f) => f.selector && f.selector !== "html" && (f.impact === "critical" || f.impact === "serious"))
+    .map((f) => ({ selector: f.selector, impact: f.impact, label: f.id }));
+  await page.evaluate((marks) => {
+    const colors = { critical: "#d1242f", serious: "#e16f24", moderate: "#bf8700", minor: "#8c959f" };
+    const layer = document.createElement("div");
+    layer.id = "__a11y-annotations";
+    layer.style.cssText = "position:absolute;left:0;top:0;pointer-events:none;z-index:2147483647";
+    document.body.append(layer); // attached first, so labels can be measured as they're placed
+    const labelled = new Set();
+    const placed = [];
+    for (const m of marks) {
+      let el;
+      try { el = document.querySelector(m.selector); } catch { continue; }
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      const box = document.createElement("div");
+      box.style.cssText = `position:absolute;left:${r.left + scrollX - 3}px;top:${r.top + scrollY - 3}px;` +
+        `width:${r.width + 6}px;height:${r.height + 6}px;border:3px solid ${colors[m.impact]};border-radius:4px;box-sizing:border-box`;
+      layer.append(box);
+      if (labelled.has(m.selector)) continue; // one label per element: the most severe, since findings are sorted
+      labelled.add(m.selector);
+      const tag = document.createElement("div");
+      tag.textContent = m.label;
+      tag.style.cssText = `position:absolute;background:${colors[m.impact]};color:#fff;` +
+        "font:600 11px/16px system-ui,sans-serif;padding:1px 5px;border-radius:3px;white-space:nowrap";
+      layer.append(tag);
+      // Above the box, or below it if that would cover another label.
+      const x = r.left + scrollX - 3, w = tag.offsetWidth, h = tag.offsetHeight;
+      const overlaps = (y) => placed.some((p) => x < p.x + p.w && p.x < x + w && y < p.y + p.h && p.y < y + h);
+      let y = Math.max(0, r.top + scrollY - h - 3);
+      if (overlaps(y)) y = r.bottom + scrollY + 3;
+      tag.style.left = `${x}px`;
+      tag.style.top = `${y}px`;
+      placed.push({ x, y, w, h });
+    }
+  }, marks);
+  await page.screenshot({ path, fullPage: true });
+  await page.evaluate(() => document.getElementById("__a11y-annotations")?.remove());
 }
 
 export function summarize(findings) {

@@ -1,4 +1,5 @@
 // Turn audit results into a Markdown report a person or an agent can act on.
+import { basename } from "node:path";
 
 const MAX_EXAMPLES = 5;
 
@@ -22,6 +23,7 @@ export function toMarkdown(results) {
     out.push(`## ${r.url}${r.clicks.length ? ` (after clicking ${r.clicks.map((c) => `\`${c}\``).join(", ")})` : ""}`, "");
     out.push(`**${s.total} issues**: ${s.critical} critical, ${s.serious} serious, ${s.moderate} moderate, ${s.minor} minor. ` +
       `Keyboard walk: ${r.keyboard.stops.length} tab stops${r.keyboard.trapped ? ", **focus is trapped**" : ""}.`, "");
+    if (r.screenshot) out.push(`![Annotated screenshot: every issue outlined by severity](${basename(r.screenshot)})`, "");
     const groups = groupFindings(r.findings);
     if (!groups.length) out.push("No automatically detectable issues. See the manual checks below.", "");
     for (const g of groups) {

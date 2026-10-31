@@ -4,6 +4,8 @@
 
 **Your coding agent can find and fix accessibility bugs, and prove they're fixed.**
 
+![The audit finds 31 issues on a demo shop page and outlines each one on a screenshot; after the fixes, a re-run finds 0](https://raw.githubusercontent.com/Necromancervbh/a11y-audit-skill/main/docs/demo.gif)
+
 An accessibility audit skill for Claude Code, Codex and Cursor. It runs your page in a real browser, checks it against WCAG 2.2 A/AA, tabs through it like a keyboard-only user, and reads it like a screen reader. Your agent fixes the findings in your source code, then re-runs the audit to verify each fix.
 
 The EU Accessibility Act has been enforced since June 2025, and US ADA lawsuits over inaccessible websites run in the thousands every year. AI-generated UIs are full of `<div onclick>` buttons, missing labels and invisible focus. This catches them before your users or a lawyer do.
@@ -44,6 +46,7 @@ npx playwright install chromium
 npx a11y-audit http://localhost:3000                        # writes a11y-report/report.md + report.json
 npx a11y-audit http://localhost:3000 --click "#open-signin" # audit the sign-in dialog, open
 npx a11y-audit ./dist/index.html --fail-on critical         # local files work too
+npx a11y-audit http://localhost:3000 --screenshot           # plus page-1.png with every issue outlined
 ```
 
 Exit code 1 means issues at or above `--fail-on` (default `serious`), so it drops straight into CI:
@@ -84,6 +87,7 @@ Automated tools find roughly a third to half of real accessibility problems. The
 ```bash
 npm install && npx playwright install chromium
 npm test          # unit tests + real-browser runs against both demo pages
+node scripts/make-demo-gif.mjs   # re-render docs/demo.gif from real audits (needs ffmpeg)
 ```
 
 MIT licensed. Rules by [axe-core](https://github.com/dequelabs/axe-core) (MPL-2.0), browser by [Playwright](https://playwright.dev).
