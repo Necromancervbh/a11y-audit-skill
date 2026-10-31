@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// a11y-audit <url-or-file>... [--click <selector>]... [--out <dir>] [--fail-on <impact>] [--max-tabs <n>]
+// a11y-audit-skill <url-or-file>... [--click <selector>]... [--out <dir>] [--fail-on <impact>] [--max-tabs <n>]
 import { mkdirSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,7 +8,7 @@ import { audit } from "./audit.mjs";
 import { toMarkdown } from "./report.mjs";
 
 const IMPACTS = ["critical", "serious", "moderate", "minor"];
-const USAGE = `usage: a11y-audit <url-or-file>... [options]
+const USAGE = `usage: a11y-audit-skill <url-or-file>... [options]
 
 Audits each page in a real browser: axe-core WCAG 2.2 rules, a keyboard-only
 walk (focus visibility, keyboard traps, click-only controls), and the

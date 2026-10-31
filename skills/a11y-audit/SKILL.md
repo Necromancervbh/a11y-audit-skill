@@ -15,15 +15,15 @@ It never changes code. You do that, then prove each fix by re-running it.
 
 ## Workflow
 
-0. **Install once** (if `npx a11y-audit --help` fails): `npm install --save-dev github:Necromancervbh/a11y-audit-skill && npx playwright install chromium`.
+0. **Install once** (if `npx a11y-audit-skill --help` fails): `npm install --save-dev a11y-audit-skill && npx playwright install chromium`.
 
 1. **Get a URL.** Use the dev server if the project has one (`npm run dev`), or a built HTML file path. Ask the user if neither is obvious.
 
 2. **Audit every important state**, not just the first paint. Use `--click` to open dialogs, menus and drawers first:
 
    ```bash
-   npx a11y-audit http://localhost:3000 --out a11y-report
-   npx a11y-audit http://localhost:3000 --click "button.open-signin" --out a11y-report/signin
+   npx a11y-audit-skill http://localhost:3000 --out a11y-report
+   npx a11y-audit-skill http://localhost:3000 --click "button.open-signin" --out a11y-report/signin
    ```
 
    Exit code 1 means critical or serious issues; `--fail-on` changes the threshold. Read `a11y-report/report.md`. Add `--screenshot` to also get `page-N.png` with each critical and serious issue outlined; it helps you match findings to components. `report.json` has the same findings for scripting.

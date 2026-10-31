@@ -1,6 +1,6 @@
 {
   "name": "a11y-audit-skill",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "An accessibility audit skill for coding agents: WCAG 2.2 checks in a real browser, a keyboard-only walk, and verified fixes.",
   "scripts": {
     "test": "node --test",
@@ -25,7 +25,8 @@
     "playwright": "^1.64.1"
   },
   "bin": {
-    "a11y-audit": "src/cli.mjs"
+    "a11y-audit": "src/cli.mjs",
+    "a11y-audit-skill": "src/cli.mjs"
   },
   "exports": "./src/audit.mjs",
   "files": [

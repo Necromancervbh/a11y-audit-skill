@@ -40,13 +40,13 @@ It's also told never to game the audit: no `aria-hidden` to silence findings, an
 ## Use it directly
 
 ```bash
-npm install --save-dev github:Necromancervbh/a11y-audit-skill
+npm install --save-dev a11y-audit-skill
 npx playwright install chromium
 
-npx a11y-audit http://localhost:3000                        # writes a11y-report/report.md + report.json
-npx a11y-audit http://localhost:3000 --click "#open-signin" # audit the sign-in dialog, open
-npx a11y-audit ./dist/index.html --fail-on critical         # local files work too
-npx a11y-audit http://localhost:3000 --screenshot           # plus page-1.png with every issue outlined
+npx a11y-audit-skill http://localhost:3000                         # writes a11y-report/report.md + report.json
+npx a11y-audit-skill http://localhost:3000 --click "#open-signin"  # audit the sign-in dialog, open
+npx a11y-audit-skill ./dist/index.html --fail-on critical          # local files work too
+npx a11y-audit-skill http://localhost:3000 --screenshot            # plus page-1.png with every issue outlined
 ```
 
 Exit code 1 means issues at or above `--fail-on` (default `serious`).
@@ -69,10 +69,10 @@ The job fails on issues at or above `fail-on`, the full report appears in the ru
 `demo/broken-shop` is a small shop page with 11 deliberate, common bugs, and `demo/fixed-shop` is the same page fixed:
 
 ```
-$ npx a11y-audit demo/broken-shop/index.html --click ".top .btn"
+$ npx a11y-audit-skill demo/broken-shop/index.html --click ".top .btn"
 …/broken-shop/index.html: 30 issues (5 critical, 11 serious, 14 moderate, 0 minor)
 
-$ npx a11y-audit demo/fixed-shop/index.html
+$ npx a11y-audit-skill demo/fixed-shop/index.html
 …/fixed-shop/index.html: 0 issues (0 critical, 0 serious, 0 moderate, 0 minor)
 ```
 
