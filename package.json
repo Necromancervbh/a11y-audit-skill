@@ -1,0 +1,44 @@
+{
+  "name": "a11y-audit-skill",
+  "version": "0.1.0",
+  "description": "An accessibility audit skill for coding agents: WCAG 2.2 checks in a real browser, a keyboard-only walk, and verified fixes.",
+  "scripts": {
+    "test": "node --test",
+    "audit:demo": "node src/cli.mjs demo/broken-shop/index.html --out a11y-report"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "wcag",
+    "axe-core",
+    "playwright",
+    "agent-skill",
+    "claude-code",
+    "codex",
+    "cursor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "axe-core": "^4.14.0",
+    "playwright": "^1.64.1"
+  },
+  "bin": {
+    "a11y-audit": "src/cli.mjs"
+  },
+  "exports": "./src/audit.mjs",
+  "files": [
+    "src",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Necromancervbh/a11y-audit-skill"
+  }
+}

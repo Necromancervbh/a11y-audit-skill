@@ -1,0 +1,80 @@
+<!doctype html>
+<!-- A small shop page with common, real-world accessibility bugs, for testing the audit.
+     Every bug is deliberate; demo/fixed-shop is the same page with them fixed. -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Shop</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; color: #222; }
+  .top { display: flex; gap: 16px; align-items: center; padding: 12px 24px; background: #f4f4f4; }
+  .logo { font-weight: 700; }
+  a { color: #222; }
+  *:focus { outline: none; }                       /* bug: focus is invisible */
+  .muted { color: #b5b5b5; }                       /* bug: 2.0:1 contrast */
+  .btn { display: inline-block; background: #2d6cdf; color: #fff; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 24px; }
+  .card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
+  .card img { width: 100%; height: 120px; background: #ddd; }
+  .modal { position: fixed; inset: 20% 30%; background: #fff; border: 1px solid #999; padding: 20px; display: none; }
+  .modal.open { display: block; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <span class="logo">Shop</span>
+    <a href="#">Home</a>
+    <a href="#">Deals</a>
+    <!-- bug: clickable div, not a button: no keyboard access, no role -->
+    <div class="btn" onclick="openModal()">Sign in</div>
+  </div>
+
+  <h1>Spring sale</h1>
+  <p class="muted">Up to 50% off everything, today only.</p>
+
+  <!-- bug: heading levels skip from h1 to h4 -->
+  <h4>Popular right now</h4>
+
+  <div class="grid">
+    <div class="card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">   <!-- bug: no alt -->
+      <h4>Desk lamp</h4>
+      <p class="muted">$29</p>
+      <div class="btn" onclick="add('lamp')">Add to cart</div>
+    </div>
+    <div class="card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
+      <h4>Notebook</h4>
+      <p class="muted">$9</p>
+      <div class="btn" onclick="add('notebook')">Add to cart</div>
+    </div>
+    <div class="card">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
+      <h4>Pen set</h4>
+      <p class="muted">$12</p>
+      <a href="#" onclick="add('pens')"><svg width="20" height="20"><circle cx="10" cy="10" r="8"/></svg></a>  <!-- bug: icon link with no name -->
+    </div>
+  </div>
+
+  <h4>Newsletter</h4>
+  <form onsubmit="return false">
+    <input type="email" placeholder="Email">        <!-- bug: no label -->
+    <input type="submit" value="">                  <!-- bug: empty button -->
+  </form>
+
+  <div class="modal" id="modal">
+    <h2>Sign in</h2>
+    <!-- bug: keyboard trap: Tab always jumps back to the first field -->
+    <input id="user" placeholder="Username" onkeydown="trap(event)">
+    <input id="pass" type="password" placeholder="Password" onkeydown="trap(event)">
+  </div>
+
+<script>
+  function add(item) { console.log('added', item); }
+  function openModal() { document.getElementById('modal').classList.add('open'); document.getElementById('user').focus(); }
+  function trap(e) {
+    if (e.key === 'Tab') { e.preventDefault(); document.getElementById(e.target.id === 'user' ? 'pass' : 'user').focus(); }
+  }
+</script>
+</body>
+</html>

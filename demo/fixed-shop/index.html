@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- demo/broken-shop with its accessibility bugs fixed: the audit should find nothing serious here. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spring sale – Shop</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; color: #222; }
+  .top { display: flex; gap: 16px; align-items: center; padding: 12px 24px; background: #f4f4f4; }
+  .logo { font-weight: 700; }
+  a { color: #222; }
+  :focus-visible { outline: 3px solid #2d6cdf; outline-offset: 2px; }
+  .muted { color: #595959; }
+  .btn { background: #2d6cdf; color: #fff; padding: 8px 14px; border: 0; border-radius: 6px; font: inherit; cursor: pointer; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 24px; list-style: none; margin: 0; }
+  .card { border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
+  .card img { width: 100%; height: 120px; background: #ddd; }
+  .modal { position: fixed; inset: 20% 30%; background: #fff; border: 1px solid #999; padding: 20px; }
+  .modal[hidden] { display: none; }
+</style>
+</head>
+<body>
+  <header class="top">
+    <span class="logo">Shop</span>
+    <nav aria-label="Main"><a href="#">Home</a> <a href="#">Deals</a></nav>
+    <button class="btn" type="button" onclick="openModal()">Sign in</button>
+  </header>
+
+  <main>
+    <h1>Spring sale</h1>
+    <p class="muted">Up to 50% off everything, today only.</p>
+
+    <h2>Popular right now</h2>
+    <ul class="grid">
+      <li class="card">
+        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Brass desk lamp">
+        <h3>Desk lamp</h3>
+        <p class="muted">$29</p>
+        <button class="btn" type="button" onclick="add('lamp')">Add desk lamp to cart</button>
+      </li>
+      <li class="card">
+        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Dotted A5 notebook">
+        <h3>Notebook</h3>
+        <p class="muted">$9</p>
+        <button class="btn" type="button" onclick="add('notebook')">Add notebook to cart</button>
+      </li>
+      <li class="card">
+        <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Set of three gel pens">
+        <h3>Pen set</h3>
+        <p class="muted">$12</p>
+        <a href="#" onclick="add('pens')" aria-label="Add pen set to cart"><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="8"/></svg></a>
+      </li>
+    </ul>
+
+    <h2>Newsletter</h2>
+    <form onsubmit="return false">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email">
+      <button class="btn" type="submit">Subscribe</button>
+    </form>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <h2 id="modal-title">Sign in</h2>
+    <label for="user">Username</label> <input id="user" autocomplete="username">
+    <label for="pass">Password</label> <input id="pass" type="password" autocomplete="current-password">
+    <button class="btn" type="button" onclick="closeModal()">Close</button>
+  </div>
+
+<script>
+  function add(item) { console.log('added', item); }
+  function openModal() { document.getElementById('modal').hidden = false; document.getElementById('user').focus(); }
+  function closeModal() { document.getElementById('modal').hidden = true; }
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
