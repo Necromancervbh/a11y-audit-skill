@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { audit, detectTrap, wcagCriterion } from "../src/audit.mjs";
+import { audit, detectTrap, formatFix, wcagCriterion } from "../src/audit.mjs";
 import { main } from "../src/cli.mjs";
 import { groupFindings } from "../src/report.mjs";
 
@@ -62,8 +62,18 @@ test("the fixed shop is clean, dialog included", async () => {
 test("cli writes both reports and fails on serious issues", async () => {
   const out = mkdtempSync(join(tmpdir(), "a11y-"));
   assert.equal(await main([BROKEN, "--out", out]), 1);
-  assert.match(readFileSync(join(out, "report.md"), "utf8"), /CRITICAL: Images must have alternative text/);
+  const md = readFileSync(join(out, "report.md"), "utf8");
+  assert.match(md, /CRITICAL: Images must have alternative text/);
+  assert.ok(md.includes("**How to fix:** Fix any one of these:\n- Element does not have an alt attribute"), "fix advice isn't a list");
   assert.equal(JSON.parse(readFileSync(join(out, "report.json"), "utf8"))[0].summary.critical, 4);
   assert.equal(await main([BROKEN, "--out", out, "--fail-on", "none"]), 0);
   assert.equal(await main([FIXED, "--out", out]), 0);
+});
+
+test("axe's fix advice becomes short bulleted lists", () => {
+  assert.equal(formatFix("Fix any of the following:\n  Element does not have an alt attribute\n  Element has no title attribute"),
+    "Fix any one of these:\n- Element does not have an alt attribute\n- Element has no title attribute");
+  assert.equal(formatFix("Fix all of the following:\n  A\n\nFix any of the following:\n  B\n  C"),
+    "Fix all of these:\n- A\nFix any one of these:\n- B\n- C");
+  assert.equal(formatFix("Use a real button"), "Use a real button");
 });

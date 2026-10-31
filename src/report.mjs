@@ -27,7 +27,7 @@ export function toMarkdown(results) {
     for (const g of groups) {
       const sc = g.wcag.length ? `WCAG ${g.wcag.join(", ")}` : "best practice";
       out.push(`### ${g.impact.toUpperCase()}: ${g.title} (\`${g.id}\`, ${sc}, ${g.count}×)`, "");
-      out.push(`**Fix:** ${g.fix}`, "");
+      out.push(`**How to fix:** ${g.fix}`, "");
       for (const p of g.places) out.push(`- \`${p.selector}\`${p.html ? ` — \`${p.html.replace(/`/g, "'").replace(/\s+/g, " ").slice(0, 120)}\`` : ""}`);
       if (g.count > g.places.length) out.push(`- …and ${g.count - g.places.length} more`);
       out.push("", `[Rule details](${g.helpUrl})`, "");

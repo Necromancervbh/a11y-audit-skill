@@ -69,10 +69,10 @@ The report groups issues by rule, with the WCAG criterion, a fix, and the exact 
 
 ```markdown
 ### CRITICAL: Keyboard trap: Tab cycles between #pass, #user and never leaves (`keyboard-trap`, WCAG 2.1.2, 1×)
-**Fix:** Let Tab move focus out, or give the component an obvious exit (Escape closes a dialog and returns focus to what opened it).
+**How to fix:** Let Tab move focus out, or give the component an obvious exit (Escape closes a dialog and returns focus to what opened it).
 
 ### SERIOUS: "Sign in" works with a mouse but can't be reached with a keyboard (`click-only-control`, WCAG 2.1.1, 3×)
-**Fix:** Use a real <button> (or <a href> for navigation). …
+**How to fix:** Use a real <button> (or <a href> for navigation). …
 ```
 
 ## Limits
