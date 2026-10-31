@@ -17,6 +17,20 @@ export function wcagCriterion(tag) {
   return m ? `${m[1]}.${m[2]}.${m[3]}` : null;
 }
 
+/**
+ * axe's failureSummary is "Fix any of the following:" or "Fix all of the
+ * following:" with one indented line per failing check, sometimes both.
+ * Turn it into short bulleted lists instead of one run-on sentence.
+ */
+export function formatFix(summary) {
+  return summary.split(/\n\s*\n/).map((block) => {
+    const [head, ...checks] = block.split("\n").map((s) => s.trim()).filter(Boolean);
+    if (!checks.length) return head;
+    const lead = /\ball\b/i.test(head) ? "Fix all of these:" : "Fix any one of these:";
+    return [lead, ...checks.map((c) => `- ${c}`)].join("\n");
+  }).join("\n");
+}
+
 /** A URL, or a local file path turned into a file:// URL. */
 export function toUrl(target) {
   if (/^[a-z][a-z0-9+.-]*:\/\//i.test(target)) return target;
@@ -68,7 +82,7 @@ async function runAxe(page) {
     title: v.help,
     selector: n.target.join(" "),
     html: n.html.slice(0, 200),
-    fix: n.failureSummary.replace(/\s+/g, " ").trim(),
+    fix: formatFix(n.failureSummary),
     helpUrl: v.helpUrl,
   })));
 }
