@@ -13,7 +13,7 @@ inputs:
     description: Selectors to click before auditing, one per line, to audit a state like an open dialog.
     default: ""
   fail-on:
-    description: Fail when there's an issue this severe or worse: critical, serious, moderate, minor, or none.
+    description: "Fail when there's an issue this severe or worse: critical, serious, moderate, minor, or none."
     default: serious
   screenshot:
     description: Also save page-1.png with each critical and serious issue outlined.
