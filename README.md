@@ -85,6 +85,7 @@ Automated tools find roughly a third to half of real accessibility problems. The
 ```bash
 npm install && npx playwright install chromium
 npm test          # unit tests + real-browser runs against both demo pages
+node scripts/make-demo-gif.mjs   # re-render docs/demo.gif from real audits (needs ffmpeg)
 ```
 
 MIT licensed. Rules by [axe-core](https://github.com/dequelabs/axe-core) (MPL-2.0), browser by [Playwright](https://playwright.dev).
