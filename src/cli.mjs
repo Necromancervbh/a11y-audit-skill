@@ -20,6 +20,7 @@ options:
   --fail-on <impact>   exit 1 if any issue is this severe or worse: critical, serious (default),
                        moderate, minor, or none
   --max-tabs <n>       Tab presses in the keyboard walk (default 80)
+  --screenshot         also save page-N.png with every issue outlined, and show it in the report
   --json               print the JSON results instead of the summary
 `;
 
@@ -32,6 +33,7 @@ export async function main(argv = process.argv.slice(2)) {
       "fail-on": { type: "string", default: "serious" },
       "max-tabs": { type: "string", default: "80" },
       json: { type: "boolean", default: false },
+      screenshot: { type: "boolean", default: false },
       help: { type: "boolean", short: "h", default: false },
     },
   });
@@ -42,11 +44,12 @@ export async function main(argv = process.argv.slice(2)) {
   const failOn = values["fail-on"];
   if (failOn !== "none" && !IMPACTS.includes(failOn)) throw new Error(`--fail-on must be one of ${IMPACTS.join(", ")}, none`);
 
-  const results = [];
-  for (const target of positionals) {
-    results.push(await audit(target, { clicks: values.click, maxTabs: Number(values["max-tabs"]) }));
-  }
   mkdirSync(values.out, { recursive: true });
+  const results = [];
+  for (const [i, target] of positionals.entries()) {
+    const screenshot = values.screenshot ? join(values.out, `page-${i + 1}.png`) : null;
+    results.push(await audit(target, { clicks: values.click, maxTabs: Number(values["max-tabs"]), screenshot }));
+  }
   writeFileSync(join(values.out, "report.json"), JSON.stringify(results, null, 2));
   writeFileSync(join(values.out, "report.md"), toMarkdown(results));
 

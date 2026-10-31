@@ -44,6 +44,7 @@ npx playwright install chromium
 npx a11y-audit http://localhost:3000                        # writes a11y-report/report.md + report.json
 npx a11y-audit http://localhost:3000 --click "#open-signin" # audit the sign-in dialog, open
 npx a11y-audit ./dist/index.html --fail-on critical         # local files work too
+npx a11y-audit http://localhost:3000 --screenshot           # plus page-1.png with every issue outlined
 ```
 
 Exit code 1 means issues at or above `--fail-on` (default `serious`), so it drops straight into CI:

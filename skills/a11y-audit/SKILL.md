@@ -26,7 +26,7 @@ It never changes code. You do that, then prove each fix by re-running it.
    npx a11y-audit http://localhost:3000 --click "button.open-signin" --out a11y-report/signin
    ```
 
-   Exit code 1 means critical or serious issues; `--fail-on` changes the threshold. Read `a11y-report/report.md`. `report.json` has the same findings for scripting.
+   Exit code 1 means critical or serious issues; `--fail-on` changes the threshold. Read `a11y-report/report.md`. Add `--screenshot` to also get `page-N.png` with each critical and serious issue outlined; it helps you match findings to components. `report.json` has the same findings for scripting.
 
 3. **Fix in priority order:** critical, then serious, then moderate. For each finding:
    - Find the source of the element from its selector and HTML snippet: the component, template or stylesheet, not the built output.

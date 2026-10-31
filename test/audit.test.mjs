@@ -77,3 +77,12 @@ test("axe's fix advice becomes short bulleted lists", () => {
     "Fix all of these:\n- A\nFix any one of these:\n- B\n- C");
   assert.equal(formatFix("Use a real button"), "Use a real button");
 });
+
+test("--screenshot saves an annotated PNG and shows it in the report", async () => {
+  const out = mkdtempSync(join(tmpdir(), "a11y-"));
+  await main([BROKEN, "--out", out, "--screenshot", "--fail-on", "none"]);
+  const png = readFileSync(join(out, "page-1.png"));
+  assert.deepEqual([...png.subarray(1, 4)], [0x50, 0x4e, 0x47]); // "PNG"
+  assert.ok(png.length > 10_000);
+  assert.match(readFileSync(join(out, "report.md"), "utf8"), /!\[Annotated screenshot[^\]]*\]\(page-1\.png\)/);
+});
