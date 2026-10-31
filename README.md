@@ -4,6 +4,8 @@
 
 **Your coding agent can find and fix accessibility bugs, and prove they're fixed.**
 
+![The audit finds 31 issues on a demo shop page and outlines each one on a screenshot; after the fixes, a re-run finds 0](https://raw.githubusercontent.com/Necromancervbh/a11y-audit-skill/main/docs/demo.gif)
+
 An accessibility audit skill for Claude Code, Codex and Cursor. It runs your page in a real browser, checks it against WCAG 2.2 A/AA, tabs through it like a keyboard-only user, and reads it like a screen reader. Your agent fixes the findings in your source code, then re-runs the audit to verify each fix.
 
 The EU Accessibility Act has been enforced since June 2025, and US ADA lawsuits over inaccessible websites run in the thousands every year. AI-generated UIs are full of `<div onclick>` buttons, missing labels and invisible focus. This catches them before your users or a lawyer do.
